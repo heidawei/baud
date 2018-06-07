@@ -1,19 +1,18 @@
-package badgerdb
+package rocksdb
 
 import (
 	"bytes"
 	"sync"
 
-	"github.com/dgraph-io/badger"
 	"github.com/blevesearch/bleve/index/store"
+	"github.com/rubenv/gorocksdb"
 )
 
 var _ store.KVIterator  = &Iterator{}
 
 type Iterator struct {
 	close  sync.Once
-	tx     *badger.Txn
-	iter   *badger.Iterator
+	iter   *gorocksdb.Iterator
 	prefix []byte
 	start  []byte
 	end    []byte
@@ -48,16 +47,10 @@ func (i *Iterator) Seek(k []byte) {
 			return
 		}
 	}
-	var err error
 	i.iter.Seek(k)
 	if i.iter.Valid() {
-		item := i.iter.Item()
-		i.key = item.Key()
-		i.val, err = item.Value()
-		if err != nil {
-			i.key = nil
-			i.val = nil
-		}
+		i.key = i.iter.Key().Data()
+		i.val = i.iter.Value().Data()
 	} else {
 		i.key = nil
 		i.val = nil
@@ -69,16 +62,10 @@ func (i *Iterator) Next() {
 	if i == nil {
 		return
 	}
-	var err error
 	i.iter.Next()
 	if i.iter.Valid() {
-		item := i.iter.Item()
-		i.key = item.Key()
-		i.val, err = item.Value()
-		if err != nil {
-			i.key = nil
-			i.val = nil
-		}
+		i.key = i.iter.Key().Data()
+		i.val = i.iter.Value().Data()
 	} else {
 		i.key = nil
 		i.val = nil
@@ -121,9 +108,6 @@ func (i *Iterator) Close() error {
 	i.close.Do(func() {
 		if i.iter != nil {
 			i.iter.Close()
-		}
-		if i.tx != nil {
-			i.tx.Discard()
 		}
 	})
 

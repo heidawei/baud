@@ -1,4 +1,4 @@
-package badgerdb
+package rocksdb
 
 import (
 	"os"
@@ -18,7 +18,7 @@ var _ store.KVStore = &Store{}
 type Store struct {
 	path string
 	db   *gorocksdb.DB
-	mo store.MergeOperator
+	mo   store.MergeOperator
 }
 
 func New(mo store.MergeOperator, config map[string]interface{}) (store.KVStore, error) {
@@ -59,15 +59,17 @@ func (s *Store) Writer() (store.KVWriter, error) {
 // read data from the KVStore.  If a reader cannot
 // be obtained a non-nil error is returned.
 func(s *Store) Reader() (store.KVReader, error) {
-	tx := s.db.NewSnapshot()
-	return NewReader(tx), nil
+	return NewReader(s.db), nil
 }
 
 func (bs *Store) Close() error {
 	if bs == nil {
 		return nil
 	}
-	return bs.db.Close()
+	if bs.db != nil {
+		bs.db.Close()
+	}
+	return nil
 }
 
 func init() {

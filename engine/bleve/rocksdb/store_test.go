@@ -1,4 +1,4 @@
-package badgerdb
+package rocksdb
 
 import (
 	"os"
@@ -11,6 +11,7 @@ import (
 func open(t *testing.T) store.KVStore {
 	config := make(map[string]interface{})
 	config["path"] = "test"
+	config["read_only"] = false
 	rv, err := New(nil, config)
 	if err != nil {
 		t.Fatal(err)
@@ -29,49 +30,49 @@ func cleanup(t *testing.T, s store.KVStore) {
 	}
 }
 
-func TestBadgerDBKVCrud(t *testing.T) {
+func TestRocksDBKVCrud(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestKVCrud(t, s)
 }
 
-func TestBadgerDBReaderIsolation(t *testing.T) {
+func TestRocksDBReaderIsolation(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestReaderIsolation(t, s)
 }
 
-func TestBadgerDBReaderOwnsGetBytes(t *testing.T) {
+func TestRocksDBReaderOwnsGetBytes(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestReaderOwnsGetBytes(t, s)
 }
 
-func TestBadgerDBWriterOwnsBytes(t *testing.T) {
+func TestRocksDBWriterOwnsBytes(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestWriterOwnsBytes(t, s)
 }
 
-func TestBadgerDBPrefixIterator(t *testing.T) {
+func TestRocksDBPrefixIterator(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestPrefixIterator(t, s)
 }
 
-func TestBadgerDBPrefixIteratorSeek(t *testing.T) {
+func TestRocksDBPrefixIteratorSeek(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestPrefixIteratorSeek(t, s)
 }
 
-func TestBadgerDBRangeIterator(t *testing.T) {
+func TestRocksDBRangeIterator(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestRangeIterator(t, s)
 }
 
-func TestBadgerDBRangeIteratorSeek(t *testing.T) {
+func TestRocksDBRangeIteratorSeek(t *testing.T) {
 	s := open(t)
 	defer cleanup(t, s)
 	test.CommonTestRangeIteratorSeek(t, s)

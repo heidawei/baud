@@ -1,31 +1,35 @@
-package badgerdb
+package rocksdb
 
 import (
 	"github.com/blevesearch/bleve/index/store"
-	"github.com/dgraph-io/badger"
 	"github.com/rubenv/gorocksdb"
+	"github.com/tiglabs/baudengine/util/bytes"
 )
 
 var _ store.KVReader = &Reader{}
 
 type Reader struct {
-	tx   *gorocksdb.Snapshot
+	ops  *gorocksdb.ReadOptions
+	snap *gorocksdb.Snapshot
+	tx   *gorocksdb.DB
 }
 
-func NewReader(tx *gorocksdb.Snapshot) *Reader {
-	return &Reader{tx: tx}
+func NewReader(tx *gorocksdb.DB) *Reader {
+	r := &Reader{tx: tx, ops: gorocksdb.NewDefaultReadOptions(), snap: tx.NewSnapshot()}
+	r.ops.SetSnapshot(r.snap)
+	return r
 }
 
 func (r *Reader)Get(key []byte) ([]byte, error) {
-	gorocksdb.
-	v, err := r.tx.(key)
-	if err == badger.ErrKeyNotFound {
-		return nil, nil
-	}
+	v, err := r.tx.Get(r.ops, key)
 	if err != nil {
 		return nil, err
 	}
-	return v.ValueCopy([]byte(nil))
+	defer v.Free()
+	if v.Size() == 0 {
+		return nil, nil
+	}
+	return bytes.CloneBytes(v.Data()), nil
 }
 
 // MultiGet retrieves multiple values in one call.
@@ -44,11 +48,8 @@ func (r *Reader)MultiGet(keys [][]byte) ([][]byte, error) {
 // PrefixIterator returns a KVIterator that will
 // visit all K/V pairs with the provided prefix
 func (r *Reader)PrefixIterator(prefix []byte) store.KVIterator {
-	opts := badger.DefaultIteratorOptions
-	opts.PrefetchSize = 10
-	it := r.tx.NewIterator(opts)
+	it := r.tx.NewIterator(r.ops)
 	rv := &Iterator{
-		tx:     r.tx,
 		iter:   it,
 		prefix: prefix,
 	}
@@ -60,11 +61,8 @@ func (r *Reader)PrefixIterator(prefix []byte) store.KVIterator {
 // RangeIterator returns a KVIterator that will
 // visit all K/V pairs >= start AND < end
 func (r *Reader)RangeIterator(start, end []byte) store.KVIterator {
-	opts := badger.DefaultIteratorOptions
-	opts.PrefetchSize = 10
-	it := r.tx.NewIterator(opts)
+	it := r.tx.NewIterator(r.ops)
 	rv := &Iterator{
-		tx:    r.tx,
 		iter:  it,
 		start: start,
 		end:   end,
@@ -76,6 +74,7 @@ func (r *Reader)RangeIterator(start, end []byte) store.KVIterator {
 
 // Close closes the iterator
 func (r *Reader)Close() error {
-	r.tx.Discard()
+	r.snap.Release()
+	r.ops.Destroy()
 	return nil
 }
