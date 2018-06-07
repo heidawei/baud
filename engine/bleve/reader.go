@@ -11,6 +11,7 @@ import (
 	"github.com/tiglabs/baudengine/engine"
 	"github.com/tiglabs/baudengine/engine/bleve/query"
 	"github.com/blevesearch/bleve"
+	"github.com/tiglabs/baudengine/util/json"
 )
 
 func(r *Bleve)GetApplyID() (uint64, error) {
@@ -84,10 +85,14 @@ func(r *Bleve)Search(ctx context.Context, req *engine.SearchRequest)(*engine.Sea
 	if req.Explain {
 		searchReq.Explain = true
 	}
+	searchReq.Fields = req.Fields
+	searchReq.IncludeLocations = req.IncludeLocations
 	result, err := r.index.SearchInContext(ctx, searchReq)
 	if err != nil {
 		return nil, err
 	}
+	data, _ := json.Marshal(result)
+	fmt.Println(string(data))
 	res := bleveResultToBaudResult(req.Index, req.Type, result)
 	if int64(req.Timeout/time.Millisecond) < res.Took {
 		res.TimeOut = true

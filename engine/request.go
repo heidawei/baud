@@ -15,13 +15,16 @@ type SearchRequest struct {
 	Size      int    `json:"size,omitempty"`
 	// default 0
 	From      int    `json:"from,omitempty"`
+	Fields    []string `json:"fields"`
 	Query     []byte `json:"query"`
 	Explain   bool   `json:"explain,omitempty"`
 	Timeout   time.Duration `json:"time_out,omitempty"`
+	IncludeLocations bool `json:"include_locations,omitempty"`
 }
 
 func NewSearchQuery(_index, _type string) *SearchRequest {
-	return &SearchRequest{Index:_index, Type:_type, ProtocolType: "json", Size: 10, From: 0, Explain: false, Timeout: 0}
+	return &SearchRequest{Index:_index, Type:_type, ProtocolType: "json",
+	Size: 10, From: 0, Explain: false, Timeout: 0, Fields: []string{"*"}}
 }
 
 func (r *SearchRequest) SetSize(size int) {
@@ -42,6 +45,10 @@ func (r *SearchRequest) SetExplain(e bool) {
 
 func (r *SearchRequest) SetTimeout(t time.Duration) {
 	r.Timeout = t
+}
+
+func (r *SearchRequest) SetFields(fields []string) {
+	r.Fields = fields
 }
 
 func (r *SearchRequest)UnmarshalJSON(data []byte) error{

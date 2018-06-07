@@ -20,7 +20,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return filter, nil
+		return filter.Query, nil
 	}
 	rawMessage, hasBool := tmp["bool"]
 	if hasBool {
@@ -29,7 +29,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return bool, nil
+		return bool.Query, nil
 	}
 	rawMessage, hasRange := tmp["range"]
 	if hasRange {
@@ -38,7 +38,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return range_, nil
+		return range_.Query, nil
 	}
 	rawMessage, hasTerm := tmp["term"]
 	if hasTerm {
@@ -47,7 +47,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return term, nil
+		return term.Query, nil
 	}
 	rawMessage, hasTerms := tmp["terms"]
 	if hasTerms {
@@ -56,7 +56,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return terms, nil
+		return terms.Query, nil
 	}
 	rawMessage, hasPrefix := tmp["prefix"]
 	if hasPrefix {
@@ -65,7 +65,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return prefix, nil
+		return prefix.Query, nil
 	}
 	rawMessage, hasMatch := tmp["match"]
 	if hasMatch {
@@ -74,7 +74,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return match, nil
+		return match.Query, nil
 	}
 	rawMessage, hasMatchAll := tmp["match_all"]
 	if hasMatchAll {
@@ -83,7 +83,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return matchAll, nil
+		return matchAll.Query, nil
 	}
 	rawMessage, hasWildCard := tmp["wildcard"]
 	if hasWildCard {
@@ -92,7 +92,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return wildcard, nil
+		return wildcard.Query, nil
 	}
 	rawMessage, hasFuzzy := tmp["fuzzy"]
 	if hasFuzzy {
@@ -110,7 +110,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return score, nil
+		return score.Query, nil
 	}
 	rawMessage, hasRegexp := tmp["regexp"]
 	if hasRegexp {
@@ -119,7 +119,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return regexp, nil
+		return regexp.Query, nil
 	}
 	rawMessage, hasDisMax := tmp["dis_max"]
 	if hasDisMax {
@@ -128,7 +128,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return disMax, nil
+		return disMax.Query, nil
 	}
 	rawMessage, hasMultiMatch := tmp["multi_match"]
 	if hasMultiMatch {
@@ -137,7 +137,7 @@ func ParseQuery(data []byte) (query.Query, error) {
 		if err != nil {
 			return nil, err
 		}
-		return multiMatch, nil
+		return multiMatch.Query, nil
 	}
 	return nil, errors.New("invalid query")
 }

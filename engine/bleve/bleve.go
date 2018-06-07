@@ -37,6 +37,7 @@ func New(cfg engine.EngineConfig) (engine.Engine, error) {
     kvconfig["sync"] = false
     kvconfig["read_only"] = cfg.ReadOnly
 	index, err := bleve.NewUsing(path.Join(cfg.Path, "baud.bleve"), mapping, bleve.Config.DefaultIndexType, badgerdb.Name, kvconfig)
+	//index, err := bleve.New(path.Join(cfg.Path, "baud.bleve"), mapping)
 	if err != nil {
 		return nil, err
 	}

@@ -74,6 +74,12 @@ func (r *Reader)RangeIterator(start, end []byte) store.KVIterator {
 
 // Close closes the iterator
 func (r *Reader)Close() error {
-	r.tx.Discard()
+	if r == nil {
+		return nil
+	}
+	if r.tx != nil {
+		r.tx.Discard()
+	}
+
 	return nil
 }

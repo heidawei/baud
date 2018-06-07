@@ -114,6 +114,7 @@ func (d *DocumentMapping)UnmarshalJSON(schema []byte) error {
     			return err
 		    }
     		d.AddSubDocumentMapping(name, doc.DocumentMapping)
+		    continue
 	    }
 	    d.AddFieldMapping(f.FieldMapping)
     }
