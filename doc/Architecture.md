@@ -110,6 +110,29 @@ each DB is allocated with its own set of PS across different zones.
 As the shared datacenter storage, BS can be mounted to store partition data, which is log-structured sorted key-value files and redo-logs (WALs). 
 
 Note BaudEngine can also run on local filesystems - actually BS is transparent to BE. 
+### Layers
+
+* Execution
+
+router + partitionserver, http + json
+
+* Transaction
+
+intra-partition trx: inherent support
+
+inter-partition trx: intent-based
+
+* Distribution
+
+hashing-range based sharding and online re-sharding
+
+* Replication
+
+raft and async
+
+* Storage & Indexing
+
+bleve + key-value store
 
 ### partitioning 
 
